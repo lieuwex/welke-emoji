@@ -1,0 +1,3 @@
+package: welke-emoji
+import:
+- package: gopkg.in/kyokomi/emoji.v1

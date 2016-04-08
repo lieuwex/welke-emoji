@@ -1,0 +1,6 @@
+hash: d74ee0aaca19328b3e9e9e76f53c3f436abb0dc6f37ebdf30217d614e60aa69d
+updated: 2016-04-08T17:40:51.428675865+02:00
+imports:
+- name: gopkg.in/kyokomi/emoji.v1
+  version: 1f5ed6f9be2e471a618949b52b7a70fea5fd57f7
+devImports: []
