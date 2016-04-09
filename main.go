@@ -90,6 +90,10 @@ func audioHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	if err := clearDir("audio"); err != nil {
+		panic(err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
