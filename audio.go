@@ -15,8 +15,15 @@ func genAudio(path, emoji string) error {
 
 func getAudio(id, emoji string) (path string, err error) {
 	path = filepath.Join("audio", id+".aac")
-	if err = genAudio(path, emoji); err != nil {
+	exists, err := fileExists(path)
+	if err != nil {
 		return "", err
+	}
+
+	if !exists {
+		if err = genAudio(path, emoji); err != nil {
+			return "", err
+		}
 	}
 	return path, nil
 }
