@@ -38,21 +38,23 @@ class vm {
 	}
 
 	static guess(emoji) {
+		m.startComputation();
+
 		var req = new XMLHttpRequest();
 		req.open('POST', `/check/${vm.seed}${vm.current()}`, true);
 		req.onreadystatechange = () => {
-			if (req.readyState !== 4 || req.status !== 200) return;
+			if (req.readyState === 4 && req.status === 200) {
+				if (req.response === '0') {
+					vm.addIncorrect();
+				}
 
-			if (req.response === '0') {
-				vm.addIncorrect();
+				vm.current(this.current() + 1);
+				vm.saveState();
 			}
 
-			vm.current(this.current() + 1);
-			vm.saveState();
 			m.endComputation();
 		}
 
-		m.startComputation();
 		req.send(emoji);
 	}
 
@@ -106,15 +108,22 @@ var shell = function (content) {
 	];
 };
 
+var scoreCounters = function () {
+	return m('div#counters', [
+		m('div#correct', vm.current()-vm.incorrect() + ' 👍'),
+		m('div#incorrect', vm.incorrect() + ' 👎'),
+	]);
+};
+
 var view = function () {
-	console.log('view()')
-	var items = [];
+	var items;
 
 	if (vm.gameOver()) {
-		items = [
+		items = m('div#center', [
 			'game over',
+			scoreCounters(),
 			m('button', { onclick: vm.playAgain }, 'Play again'),
-		];
+		]);
 	} else if (vm.isPlaying()) {
 		items = m('div#center', [
 			m('button#audioButton', {
@@ -127,8 +136,7 @@ var view = function () {
 				'Speel af',
 				m('audio', { src: vm.getAudioPath(), autoplay: true }),
 			]),
-			m('div#current', vm.current()-vm.incorrect() + ' 👍'),
-			m('div#incorrectwrong', vm.incorrect() + ' 👎'),
+			scoreCounters(),
 			m('input[type="text"]', {
 				value: '',
 				placeholder: 'emoji',

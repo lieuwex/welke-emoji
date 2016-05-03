@@ -61,10 +61,10 @@ body {
 	margin-left: auto;
 	margin-right: auto;
 	font-size: 25px;
-	width: 500px;
+	max-width: 500px;
 }
 
-#audioButton {
+button {
 	margin-bottom: 20px;
 	font-size: 1em;
 	border: 1px lightgray solid;
@@ -75,7 +75,7 @@ body {
 	outline: 0;
 	cursor: pointer;
 }
-#audioButton:hover {
+button:hover {
 	background-color: #F1F1F1;
 }
 
@@ -85,4 +85,5 @@ input {
 	font-size: 1.2em;
 	padding: 5px;
 	margin-top: 10px;
+	width: calc(100% - 30px);
 }
