@@ -1,6 +1,6 @@
 /* global m */
-var MAX_INCORRECT = 4;
-var LOCALSTORAGE_ITEM_KEY = 'welke-emoji-state';
+const MAX_INCORRECT = 4;
+const LOCALSTORAGE_ITEM_KEY = 'welke-emoji-state';
 
 class vm {
 	static init() {
@@ -69,7 +69,7 @@ class vm {
 	// I don't really like the way we handle saving the state.
 
 	static loadState(state) {
-		var obj = JSON.parse(state);
+		const obj = JSON.parse(state);
 		vm.isPlaying(obj.isPlaying);
 		vm.gameOver(false);
 		vm.current(obj.current);
@@ -95,41 +95,41 @@ class vm {
 	}
 };
 
-var shell = function (content) {
+const shell = function (content) {
 	return [
 			m('div#header', [
 				m('div#logo', {
 					onclick: vm.reset,
 				}, [
-					'welke-emoji 😄',
+					'welke emoji 😄',
 				]),
 			]),
 			m('div#content', content),
 	];
 };
 
-var scoreCounters = function () {
+const scoreCounters = function () {
 	return m('div#counters', [
 		m('div#correct', vm.current()-vm.incorrect() + ' 👍'),
 		m('div#incorrect', vm.incorrect() + ' 👎'),
 	]);
 };
 
-var view = function () {
-	var items;
+const view = function () {
+	let content;
 
 	if (vm.gameOver()) {
-		items = m('div#center', [
+		content = m('div#center', [
 			'game over',
 			scoreCounters(),
 			m('button', { onclick: vm.playAgain }, 'Play again'),
 		]);
 	} else if (vm.isPlaying()) {
-		items = m('div#center', [
+		content = m('div#center', [
 			m('button#audioButton', {
 				onclick: (e) => {
-					var audio = e.target.lastChild;
-					audio.pause();
+					const audio = e.target.lastChild;
+					audio.currentTime = 0;
 					audio.play();
 				},
 			}, [
@@ -150,16 +150,14 @@ var view = function () {
 			}),
 		]);
 	} else {
-		items = [
-			m('button#startbutton', { onclick: vm.start }, 'start')
-		];
+		content = m('button#startbutton', { onclick: vm.start }, 'start')
 	}
 
-	return shell(items);
+	return shell(content);
 };
 
 vm.init();
-var state = localStorage.getItem(LOCALSTORAGE_ITEM_KEY);
+const state = localStorage.getItem(LOCALSTORAGE_ITEM_KEY);
 if (state != null) {
 	vm.loadState(state);
 }
