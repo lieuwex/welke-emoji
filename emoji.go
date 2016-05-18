@@ -8,21 +8,32 @@ import (
 
 func randomEmoji() string {
 	pairs := emoji.CodeMap()
-	index := rand.Intn(len(pairs))
+	for {
+		index := rand.Intn(len(pairs))
+		var res string
 
-	i := 0
-	for _, val := range pairs {
-		if i == index {
-			return val
+		i := 0
+		for _, val := range pairs {
+			if i == index {
+				res = val
+				break
+			}
+			i++
 		}
-		i++
-	}
 
-	panic("unreachable")
+		if res != "" {
+			return res
+		}
+	}
 }
 
 func isEmoji(s string) bool {
 	pairs := emoji.CodeMap()
+
+	if s == "" {
+		return false
+	}
+
 	for _, val := range pairs {
 		if val == s {
 			return true
