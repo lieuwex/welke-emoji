@@ -89,6 +89,17 @@ func audioHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path)
 }
 
+func emojiHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Path[7:]
+	if strings.TrimSpace(id) == "" {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+
+	info := getIDInfo(id)
+	w.Write([]byte(info.emoji))
+}
+
 func main() {
 	if err := clearDir("audio"); err != nil {
 		panic(err)
@@ -102,6 +113,7 @@ func main() {
 	http.HandleFunc("/", frontHandler)
 	http.HandleFunc("/check/", checkHandler)
 	http.HandleFunc("/audio/", audioHandler)
+	http.HandleFunc("/emoji/", emojiHandler)
 
 	log.Print("listening on " + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

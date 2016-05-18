@@ -8,6 +8,7 @@ class vm {
 	static init() {
 		this.isPlaying = m.prop(false);
 		this.gameOver = m.prop(false);
+		this.previousEmoji = m.prop('');
 		this.current = m.prop(0);
 		this.incorrect = m.prop(0);
 
@@ -16,6 +17,7 @@ class vm {
 	static reset() {
 		vm.isPlaying(false);
 		vm.gameOver(false);
+		vm.previousEmoji('');
 		vm.current(0);
 		vm.incorrect(0);
 		vm.saveState();
@@ -24,6 +26,7 @@ class vm {
 	}
 	static playAgain() {
 		vm.gameOver(false);
+		vm.previousEmoji('');
 		vm.current(0);
 		vm.incorrect(0);
 		vm.saveState();
@@ -39,21 +42,26 @@ class vm {
 		return `/audio/${vm.seed}${vm.current()}`
 	}
 
-	static guess(emoji) {
+	static getEmoji(callback) {
 		m.startComputation();
 
-		var req = new XMLHttpRequest();
+		const req = new XMLHttpRequest();
+		req.open('GET', `/emoji/${vm.seed}${vm.current()}`, true);
+		req.onreadystatechange = () => {
+			callback(req);
+			m.endComputation();
+		}
+
+		req.send();
+	}
+
+	static guess(emoji, callback) {
+		m.startComputation();
+
+		const req = new XMLHttpRequest();
 		req.open('POST', `/check/${vm.seed}${vm.current()}`, true);
 		req.onreadystatechange = () => {
-			if (req.readyState === 4 && req.status === 200) {
-				if (req.response === '0') {
-					vm.addIncorrect();
-				}
-
-				vm.current(this.current() + 1);
-				vm.saveState();
-			}
-
+			callback(req);
 			m.endComputation();
 		}
 
@@ -74,6 +82,7 @@ class vm {
 		const obj = JSON.parse(state);
 		vm.isPlaying(obj.isPlaying);
 		vm.gameOver(false);
+		vm.previousEmoji(obj.previousEmoji)
 		vm.current(obj.current);
 		vm.incorrect(obj.incorrect);
 		vm.seed = obj.seed;
@@ -82,6 +91,7 @@ class vm {
 	static serializeState() {
 		return JSON.stringify({
 			isPlaying: vm.isPlaying(),
+			previousEmoji: vm.previousEmoji(),
 			current: vm.current(),
 			incorrect: vm.incorrect(),
 			seed: vm.seed,
@@ -117,6 +127,11 @@ const scoreCounters = function () {
 	]);
 };
 
+const previousEmoji = function () {
+	const prev = vm.previousEmoji()
+	return m('div#previousEmoji', m('div', prev === '' ? '' : `vorige: ${prev}`));
+};
+
 const view = function () {
 	let content;
 
@@ -139,15 +154,30 @@ const view = function () {
 				m('audio', { src: vm.getAudioPath(), autoplay: true }),
 			]),
 			scoreCounters(),
+			previousEmoji(),
 			m('input[type="text"]', {
 				value: '',
 				placeholder: 'emoji',
 				autofocus: true,
 				onkeydown: (e) => {
-					var val = event.target.value.trim()
-					if (e.keyCode === 13 && val.length > 0) {
-						vm.guess(val);
-					}
+					const val = event.target.value.trim()
+					if (e.keyCode !== 13 || val.length === 0) return;
+					vm.guess(val, function (req) {
+						if (req.readyState !== 4 || req.status !== 200) return;
+
+						if (req.response === '0') {
+							vm.addIncorrect();
+							vm.getEmoji(function (req) {
+								vm.previousEmoji(req.response);
+								vm.saveState();
+							});
+						} else {
+							vm.previousEmoji(val);
+							vm.saveState();
+						}
+
+						vm.current(vm.current() + 1);
+					});
 				},
 			}),
 		]);
