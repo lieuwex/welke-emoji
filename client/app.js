@@ -2,6 +2,8 @@
 const MAX_INCORRECT = 4;
 const LOCALSTORAGE_ITEM_KEY = 'welke-emoji-state';
 
+const genSeed = () => Math.floor(Math.random() * 1000000);
+
 class vm {
 	static init() {
 		this.isPlaying = m.prop(false);
@@ -9,7 +11,7 @@ class vm {
 		this.current = m.prop(0);
 		this.incorrect = m.prop(0);
 
-		this.seed = Math.floor(Math.random() * 100);
+		this.seed = genSeed();
 	}
 	static reset() {
 		vm.isPlaying(false);
@@ -18,7 +20,7 @@ class vm {
 		vm.incorrect(0);
 		vm.saveState();
 
-		vm.seed = Math.floor(Math.random() * 100);
+		vm.seed = genSeed();
 	}
 	static playAgain() {
 		vm.gameOver(false);
@@ -26,7 +28,7 @@ class vm {
 		vm.incorrect(0);
 		vm.saveState();
 
-		vm.seed = Math.floor(Math.random() * 100);
+		vm.seed = genSeed();
 	}
 
 	static start() {
