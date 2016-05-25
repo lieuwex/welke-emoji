@@ -107,19 +107,6 @@ class vm {
 	}
 };
 
-const shell = function (content) {
-	return [
-			m('div#header', [
-				m('div#logo', {
-					onclick: vm.reset,
-				}, [
-					'welke emoji 😄',
-				]),
-			]),
-			m('div#content', content),
-	];
-};
-
 const scoreCounters = function () {
 	return m('div#counters', [
 		m('div#correct', vm.current()-vm.incorrect() + ' 👍'),
@@ -185,7 +172,7 @@ const view = function () {
 		content = m('button#startbutton', { onclick: vm.start }, 'start')
 	}
 
-	return shell(content);
+	return content;
 };
 
 vm.init();
@@ -193,4 +180,10 @@ const state = localStorage.getItem(LOCALSTORAGE_ITEM_KEY);
 if (state != null) {
 	vm.loadState(state);
 }
-m.mount(document.getElementById('container'), { view });
+m.mount(document.getElementById('content'), { view });
+
+document.getElementById('logo').addEventListener('click', function () {
+	m.startComputation();
+	vm.reset();
+	m.endComputation();
+});
