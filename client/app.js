@@ -146,8 +146,8 @@ const view = function () {
 				value: '',
 				placeholder: 'emoji',
 				autofocus: true,
-				onkeydown: (e) => {
-					const val = event.target.value.trim()
+				onkeydown: e => {
+					const val = e.target.value.trim()
 					if (e.keyCode !== 13 || val.length === 0) return;
 					vm.guess(val, function (req) {
 						if (req.readyState !== 4 || req.status !== 200) return;
